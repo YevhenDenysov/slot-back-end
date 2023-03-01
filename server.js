@@ -29,14 +29,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/api/live", require("./routes/api/liveRecord"));
 
 // Set Static Folder
-// app.use(express.static(__dirname + "/build"));
-// app.get("/*", function (req, res) {
-//   res.sendFile(__dirname + "/build/index.html", function (err) {
-//     if (err) {
-//       res.status(500).send(err);
-//     }
-//   });
-// });
+app.use(express.static(__dirname + "/out"));
+app.get("/*", function (req, res) {
+  res.sendFile(__dirname + "/out/index.html", function (err) {
+    if (err) {
+      res.status(500).send(err);
+    }
+  });
+});
 
 const PORT = process.env.PORT || 5000;
 
