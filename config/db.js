@@ -2,19 +2,17 @@ const mongoose = require('mongoose');
 
 // Connection to MongoDB
 const connectDB = async () => {
-  try {
-    await mongoose.connect("mongodb://127.0.0.1:27017/LiveDB", {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      // useCreateIndex: true,
-      // useFindAndModify: false,
-    });
+  mongoose.connect("mongodb+srv://yevhendenysov:rmeosmsdjajsl@cluster0.ph5wkcx.mongodb.net/LiveDB?retryWrites=true&w=majority", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    // useCreateIndex: true,
+    // useFindAndModify: false,
+  }).then(() => {
     console.log('MongoDB Connected...');
-  } catch (err) {
+  }).catch((err) => {
     console.error(err.message);
-    // Exit process with failure
     process.exit(1);
-  }
+  });
 };
 
 module.exports = connectDB;
