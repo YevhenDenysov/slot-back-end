@@ -38,7 +38,7 @@ app.get("/*", function (req, res) {
   });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 80;
 
 const provider = new providers.JsonRpcProvider(
   "https://data-seed-prebsc-1-s2.binance.org:8545"
