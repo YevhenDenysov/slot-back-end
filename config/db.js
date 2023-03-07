@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 // Connection to MongoDB
 const connectDB = async () => {
-  mongoose.connect("mongodb+srv://yevhendenysov:rmeosmsdjajsl@cluster0.ph5wkcx.mongodb.net/LiveDB?retryWrites=true&w=majority", {
+  mongoose.connect("mongodb+srv://YevhenDenysov:2FkTBuBi5HcJwOLN@cluster0.yhndxg9.mongodb.net/LiveDB?retryWrites=true&w=majority", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     // useCreateIndex: true,
@@ -16,3 +16,4 @@ const connectDB = async () => {
 };
 
 module.exports = connectDB;
+

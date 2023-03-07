@@ -1,23 +1,35 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
-const cors = require('cors');
+const cors = require("cors");
 const { createServer } = require("http");
 const { Contract, providers, utils } = require("ethers");
+const {Server} = require("socket.io");
 const contracts = require("./contract/abi.json");
 const connectDB = require("./config/db");
-const SaveLives = require('./routes/saveLive')
+const SaveLives = require("./routes/saveLive");
+
 const httpServer = createServer(app);
 
 require("dotenv").config();
 // Connect to Database
 connectDB();
 
-const corsOptions ={
-  origin:'http://localhost:3000', 
-  credentials:true,            //access-control-allow-credentials:true
-  optionSuccessStatus:200
-}
+const corsOptions = {
+  origin: "*",
+  credentials: true, //access-control-allow-credentials:true
+  optionSuccessStatus: 200,
+};
+
+const io = new Server(httpServer, {
+  cors: {
+    origin: "*",
+    credentials: true, //access-control-allow-credentials:true
+    optionSuccessStatus: 200,
+    allowedHeaders: ["my-custom-header"],
+  },
+});
+
 app.use(cors(corsOptions));
 
 // Initialize Middleware
@@ -50,6 +62,8 @@ const slotContract = new Contract(
   provider
 );
 
+let interval;
+
 const slotListener = async (
   playerAddress,
   wager,
@@ -59,7 +73,8 @@ const slotListener = async (
   multipliers,
   payouts,
   numGames,
-  event
+  event,
+  socket
 ) => {
   try {
     console.log("------------------------slotListener--------------");
@@ -71,26 +86,42 @@ const slotListener = async (
     console.log("multipliersLength", multipliers.length);
     console.log("payoutsLength", payouts.length);
     console.log("numGames", numGames);
-    console.log("EventHash", event.transactionHash)
+    console.log("EventHash", event.transactionHash);
 
-    SaveLives({
+    await SaveLives({
       transaction: event.transactionHash,
       playerAddress: playerAddress,
       wager: utils.formatEther(wager),
       numbets: slotIds.length,
-      multiplier: utils.formatEther(payout) / (utils.formatEther(wager) * slotIds.length),
-      profit: utils.formatEther(payout) - utils.formatEther(wager) * slotIds.length,
+      multiplier:
+        utils.formatEther(payout) /
+        (utils.formatEther(wager) * slotIds.length),
+      profit:
+        utils.formatEther(payout) - utils.formatEther(wager) * slotIds.length,
     });
+
+    io.emit("liveRecords", true);
   } catch (err) {
     console.log(err);
   }
 };
 
+io.on("connection", (socket) => {
+  console.log("New client connected");
+  // if (interval) {
+  //   clearInterval(interval);
+  // }
+  // interval = setInterval(() => getApiAndEmit(socket), 1000);
+  socket.emit("testSocket",true)
+
+});
+
 const InitializeContract = async () => {
-  console.log("------------------InitializeContract-------------------------");
+  console.log(
+  "------------------InitializeContract-------------------------"
+  );
   slotContract.on("Slots_Outcome_Event", slotListener);
 };
-
+  
 InitializeContract();
-
 httpServer.listen(PORT, () => console.log(`Server started on PORT ${PORT}`));
